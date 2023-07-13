@@ -14,9 +14,10 @@ import lombok.Setter;
 public class Estado {
 
     @Id
-    private Long id;
-    private String Nome;
+    private Integer id;
+    private String nome;
 
     @Column(columnDefinition = "bpchar(2)")
     private String uf;
+
 }

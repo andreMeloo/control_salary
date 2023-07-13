@@ -1,9 +1,6 @@
 package model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +12,7 @@ import lombok.Setter;
 public class Endereco {
 
     @Id
-    private Long id;
+    private Integer id;
     private String Descricao;
     private String cep;
     private String pais;
@@ -23,8 +20,4 @@ public class Endereco {
     @ManyToOne
     @JoinColumn(name = "id_cidade")
     private Cidade cidade;
-
-    @ManyToOne
-    @JoinColumn(name = "id_pessoa")
-    private Pessoa pessoa;
 }

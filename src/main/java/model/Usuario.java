@@ -10,17 +10,16 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Usuario {
-
     @Id
-    private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "id_pessoa")
-    private Pessoa pessoa;
+    private Integer id;
     private String login;
     private String senha;
     @Column
     private Integer tipo;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_pessoa")
+    private Pessoa pessoa;
 
     @Transient
     public TipoUsuario getTipoUsuario() {

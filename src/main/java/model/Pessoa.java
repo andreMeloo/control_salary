@@ -13,17 +13,23 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Pessoa {
     @Id
-    private Long id;
+    private Integer id;
     private String nome;
     private LocalDate data_nascimento;
     private String email;
-    private String Telefone;
+    private String telefone;
 
-    @OneToOne(mappedBy = "endereco")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_endereco")
     private Endereco endereco;
 
     @ManyToOne
     @JoinColumn(name = "id_cargo")
     private Cargo cargo;
 
+    @Transient
+    private PessoaSalario pessoaSalario;
+
+    @Transient
+    private Usuario usuario;
 }

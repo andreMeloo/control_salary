@@ -15,7 +15,7 @@ import lombok.Setter;
 public class Cidade {
 
     @Id
-    private Long id;
+    private Integer id;
     private String nome;
 
     @ManyToOne

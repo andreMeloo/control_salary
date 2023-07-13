@@ -1,11 +1,10 @@
 package model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -13,12 +12,12 @@ import lombok.Setter;
 public class PessoaSalario {
 
     @Id
-    private Long id;
+    private Integer id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_pessoa")
     private Pessoa pessoa;
     private String nome;
-    private Double salario;
+    private BigDecimal salario;
 
 }
