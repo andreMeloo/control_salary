@@ -9,10 +9,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Endereco {
+public class Endereco implements InterfacePersist {
 
     @Id
-    private Integer id;
+    @Column(name = "id",columnDefinition = "SERIAL")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private String Descricao;
     private String cep;
     private String pais;

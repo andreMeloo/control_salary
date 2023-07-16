@@ -11,9 +11,11 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Pessoa {
+public class Pessoa implements InterfacePersist {
     @Id
-    private Integer id;
+    @Column(name = "id",columnDefinition = "SERIAL")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private String nome;
     private LocalDate data_nascimento;
     private String email;
@@ -28,8 +30,8 @@ public class Pessoa {
     private Cargo cargo;
 
     @Transient
-    private PessoaSalario pessoaSalario;
+    private Usuario usuario;
 
     @Transient
-    private Usuario usuario;
+    private boolean salarioCalculado = false;
 }

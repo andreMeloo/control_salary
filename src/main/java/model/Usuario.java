@@ -9,15 +9,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Usuario {
+public class Usuario implements InterfacePersist {
     @Id
-    private Integer id;
+    @Column(name = "id",columnDefinition = "SERIAL")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private String login;
     private String senha;
     @Column
     private Integer tipo;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_pessoa")
     private Pessoa pessoa;
 
@@ -28,5 +30,9 @@ public class Usuario {
 
     public void setTipoUsuario(TipoUsuario tipoUsuario) {
         this.tipo = tipoUsuario.getValor();
+    }
+
+    public String getNomeUsuarioETipo() {
+        return this.pessoa.getNome() + " → ( " + this.getTipoUsuario().getDescricao() + " ) ";
     }
 }

@@ -1,23 +1,23 @@
 package model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.List;
+
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Cargo {
+public class Cargo implements InterfacePersist {
 
     @Id
-    private Integer id;
+    @Column(name = "id",columnDefinition = "SERIAL")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private String nome;
     private BigDecimal salario;
 }

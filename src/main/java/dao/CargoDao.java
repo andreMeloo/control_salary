@@ -11,12 +11,12 @@ public class CargoDao extends AbstractDao{
 
     public void criar(Cargo cargo) {
         try {
-            entityManager.getTransaction().begin();
-            entityManager.persist(cargo);
-            entityManager.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            getEntityManager().persist(cargo);
+            getEntityManager().getTransaction().commit();
         } catch (PersistenceException error) {
-            if (entityManager != null && entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
+            if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
+                getEntityManager().getTransaction().rollback();
             }
             error.printStackTrace();
             throw new DaoException("Erro ao criar um cargo, por favor contate o suporte para maiores detalhes.", error);
@@ -25,35 +25,35 @@ public class CargoDao extends AbstractDao{
 
     public void alterar(Cargo cargo) {
         try {
-            entityManager.getTransaction().begin();
-            entityManager.merge(cargo);
-            entityManager.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            getEntityManager().merge(cargo);
+            getEntityManager().getTransaction().commit();
         } catch (PersistenceException error) {
-            if (entityManager != null && entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
+            if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
+                getEntityManager().getTransaction().rollback();
             }
             error.printStackTrace();
             throw new DaoException("Erro ao tentar alterar o cargo, por favor contate o suporte para maiores detalhes.", error);
         } finally {
-            assert entityManager != null;
-            entityManager.close();
+            assert getEntityManager() != null;
+            getEntityManager().close();
         }
     }
 
     public void remover(Cargo cargo) {
         try {
-            entityManager.getTransaction().begin();
-            entityManager.remove(cargo);
-            entityManager.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            getEntityManager().remove(cargo);
+            getEntityManager().getTransaction().commit();
         } catch (PersistenceException error) {
-            if (entityManager != null && entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
+            if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
+                getEntityManager().getTransaction().rollback();
             }
             error.printStackTrace();
             throw new DaoException("Erro ao remover o cargo, por favor contate o suporte para maiores detalhes.", error);
         }finally {
-            if (entityManager != null) {
-                entityManager.close();
+            if (getEntityManager() != null) {
+                getEntityManager().close();
             }
         }
     }
@@ -61,12 +61,12 @@ public class CargoDao extends AbstractDao{
     public List<Cargo> findAll() {
         List<Cargo> cargos = new ArrayList<>();
         try {
-            cargos = entityManager.createQuery("SELECT cr FROM Cargo cr ORDER BY cr.nome", Cargo.class).getResultList();
+            cargos = getEntityManager().createQuery("SELECT cr FROM Cargo cr ORDER BY cr.nome", Cargo.class).getResultList();
         } catch (Exception error) {
             error.printStackTrace();
             throw new DaoException("Erro ao buscar cargos, por favor contate o suporte para maiores detalhes.", error);
         } finally {
-            entityManager.close();
+            getEntityManager().close();
         }
         return cargos;
     }

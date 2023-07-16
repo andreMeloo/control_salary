@@ -1,25 +1,27 @@
 package dao;
 
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceException;
-import model.Estado;
 import model.Pessoa;
 import model.PessoaSalario;
-import model.Usuario;
 import util.DaoException;
+import util.SqlUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PessoaSalarioDao extends AbstractDao{
 
-    public void criar(PessoaSalario pessoaSalario) {
+    public void contabilizarSalarios(List<PessoaSalario> pessoaSalarios) {
         try {
-            entityManager.getTransaction().begin();
-            entityManager.persist(pessoaSalario);
-            entityManager.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            for (PessoaSalario pessoaSalario : pessoaSalarios) {
+                getEntityManager().persist(pessoaSalario);
+            }
+            getEntityManager().getTransaction().commit();
         } catch (PersistenceException error) {
-            if (entityManager != null && entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
+            if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
+                getEntityManager().getTransaction().rollback();
             }
             error.printStackTrace();
             throw new DaoException("Erro ao criar um usuário, por favor contate o suporte para maiores detalhes.", error);
@@ -28,12 +30,12 @@ public class PessoaSalarioDao extends AbstractDao{
 
     public void remover(PessoaSalario pessoaSalario) {
         try {
-            entityManager.getTransaction().begin();
-            entityManager.remove(pessoaSalario);
-            entityManager.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            getEntityManager().remove(pessoaSalario);
+            getEntityManager().getTransaction().commit();
         } catch (PersistenceException error) {
-            if (entityManager != null && entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
+            if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
+                getEntityManager().getTransaction().rollback();
             }
             error.printStackTrace();
             throw new DaoException("Erro ao remover a pessoaSalario, por favor contate o suporte para maiores detalhes.", error);
@@ -44,9 +46,11 @@ public class PessoaSalarioDao extends AbstractDao{
         PessoaSalario pessoaSalario = new PessoaSalario();
         try {
             String sql = "SELECT ps FROM PessoaSalario ps WHERE ps.pessoa.id = :idPessoa";
-            pessoaSalario = entityManager.createQuery(sql, PessoaSalario.class)
+            pessoaSalario = getEntityManager().createQuery(sql, PessoaSalario.class)
                     .setParameter("idPessoa", idPessoa)
                     .getSingleResult();
+        } catch (NoResultException nre) {
+            pessoaSalario = null;
         } catch (Exception error) {
             error.printStackTrace();
             throw new DaoException("Erro ao realizar a busca, por favor contate o suporte para maiores detalhes.", error);
@@ -55,41 +59,29 @@ public class PessoaSalarioDao extends AbstractDao{
     }
 
     public List<PessoaSalario> findByPessoas(List<Pessoa> pessoas) {
-        // Lógica responsável por gerar o stringIn
-        StringBuilder stringIn = new StringBuilder();
-        stringIn.append(" ( ");
-
-        int t = pessoas.size();
-        for (int i = 0; i < t; i++) {
-            stringIn.append(pessoas.get(i).getId());
-            if (i < (t - 1)) {
-                stringIn.append(",");
-            }
-        }
-        stringIn.append(" )");
-
         List<PessoaSalario> PessoasSalarios = new ArrayList<>();
         try {
-            PessoasSalarios = entityManager.createQuery("SELECT ps FROM PessoaSalario ps WHERE ps.pessoa.id IN " + stringIn.toString() + " ORDER BY ps.pessoa.nome", PessoaSalario.class).getResultList();
+            PessoasSalarios = getEntityManager().createQuery("SELECT ps FROM PessoaSalario ps WHERE ps.pessoa.id IN " + SqlUtil.gerarStringInSQL(pessoas) + " ORDER BY ps.pessoa.nome", PessoaSalario.class).getResultList();
         } catch (Exception error) {
             error.printStackTrace();
-            throw new DaoException("Erro ao realizar a busca, por favor contate o suporte para maiores detalhes.", error);
+            throw new DaoException("Erro ao buscar pessoas, por favor contate o suporte para maiores detalhes.", error);
         }
         return PessoasSalarios;
-
     }
 
-    public Integer countPessoasSemSlarioCalculado() {
-        Integer numPessoas = 0;
+    public Integer countPessoasSemSalarioCalculado(List<Pessoa> pessoas) {
+        Long numPessoas = 0L;
         try {
-            numPessoas = (Integer) entityManager.createQuery("SELECT count(p) FROM Pessoa p WHERE NOT EXISTS ( SELECT 1 FROM PessoaSalario ps WHERE ps.pessoa.id = p.id)")
+            numPessoas = (Long) getEntityManager().createQuery("SELECT count(distinct p) FROM Pessoa p WHERE p.id IN " + SqlUtil.gerarStringInSQL(pessoas) + " AND NOT EXISTS ( SELECT 1 FROM PessoaSalario ps WHERE ps.pessoa.id = p.id)")
                     .getSingleResult();
 
+        } catch (NoResultException nre) {
+            numPessoas = 0L;
         } catch (Exception error) {
             error.printStackTrace();
             throw new DaoException("Erro ao realizar a busca, por favor contate o suporte para maiores detalhes.", error);
         }
-        return numPessoas;
+        return numPessoas.intValue();
     }
 
 }

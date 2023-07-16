@@ -9,12 +9,14 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-public class PessoaSalario {
+public class PessoaSalario implements InterfacePersist {
 
     @Id
-    private Integer id;
+    @Column(name = "id",columnDefinition = "SERIAL")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_pessoa")
     private Pessoa pessoa;
     private String nome;
