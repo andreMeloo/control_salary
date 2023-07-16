@@ -1,0 +1,56 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <li style="list-style-image: none; list-style: none;">
+        <div id="tituloSidebar">
+            Navegação
+        </div>
+        <ul id="ulSidebar">
+            <li class="liSidebar">
+                <h:commandLink id="cadastroUser"  styleClass="linkNavigation" value="Cadastro de Usuário" disabled="true">
+                    <f:ajax event="click" execute="@this" render="@all"/>
+                </h:commandLink>
+            </li>
+            <li class="liSidebar">
+                <h:commandLink id="cargosSec" styleClass="linkNavigation" value="Seção de Cargos" disabled="true">
+                    <f:ajax event="click" execute="@this" render="@all"/>
+                </h:commandLink>
+            </li>
+            <li class="liSidebar">
+                <h:commandLink id="listagemFunc"
+                               styleClass="linkNavigation #{pessoaSalarioMbean.getbotaoNavegacaoClicado() == 'listagemFunc' ? 'botaoClicado' : ''}"
+                               value="Lista de Funcionários" action="#{pessoaSalarioMbean.entrarListagemFuncionarios()}">
+                    <f:ajax event="click" execute="@this" render="@all"/>
+                </h:commandLink>
+            </li>
+        </ul>
+    </li>
+    <style>
+        #ulSidebar {
+            margin: 0;
+            padding-inline-start: 25px;
+            padding-right: 10px;
+        }
+
+        #tituloSidebar {
+            background-color: #344035;
+            color: #E5F1E8;
+            font-weight: bold;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .liSidebar {
+            margin-top: 10px;
+        }
+
+        .botaoClicado {
+            background-color: #EBFDEE !important;
+            pointer-events: none;
+            cursor: default;
+        }
+    </style>
+</ui:composition>
+
+

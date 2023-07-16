@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+        <c:forEach items="#{listMessagesSystemControl.messagesSystem}" var="mensagem">
+            <h:graphicImage value="resources/icon_erro.png" alt="icone aviso!" rendered="#{mensagem.erro}"/>
+            <h:graphicImage value="resources/icon_sucess.png" alt="icone aviso!" rendered="#{mensagem.sucesso}"/>
+            <h:outputText value="#{mensagem.mensagem}" styleClass="#{mensagem.sucesso ? 'mensagemSucesso' : 'mensagemErro'}"/>
+        </c:forEach>
+        <h:commandLink style="cursor: pointer; font-size: 12px; margin-left: 35px;"
+                value="(X) Fechar Mensagem" action="#{listMessagesSystemControl.fechaBlocoMensagens()}" >
+            <f:ajax render="@form"/>
+        </h:commandLink>
+    <style>
+        .messages img {
+            width: 17px;
+        }
+
+        .messages .mensagemErro {
+            color: #D91818;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .messages .mensagemSucesso {
+            color: #5CE650;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+        }
+    </style>
+</ui:composition>
