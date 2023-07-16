@@ -1,12 +1,333 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html
-        xmlns:h="http://java.sun.com/jsf/html"
->
-<h:form>
-    <h:commandButton value="testert" action="#{autenticadorMbean.validarUsuario()}"/>
-</h:form>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<f:view>
+    <h:head>
+        <title>Salary</title>
+        <!-- Fonte 'Nunito Sans' -->
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;0,1000;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900;1,1000&amp;display=swap" rel="stylesheet"/>
+
+        <!-- Fonte 'Roboto Mono', monospace -->
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com"/>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&amp;display=swap" rel="stylesheet"/>
+    </h:head>
+    <h:body id="body">
+        <h:form id="container">
+            <header id="header">
+                <div id="blocoNomeApp">
+                    <span>Sistema Salary v1.0 - Developed by André Melo</span>
+                </div>
+                <h:panelGroup layout="block" rendered="#{autenticadorMbean.usuarioSessao.id != 0}" styleClass="blocoUsuario">
+                    <span>Usuario: <span>#{autenticadorMbean.usuarioSessao.id != 0 ? autenticadorMbean.usuarioSessao.nomeUsuarioETipo : ""}</span></span>
+                    <h:panelGroup layout="block" rendered="#{autenticadorMbean.usuarioSessao.id != 0}">
+                        <h:commandLink styleClass="linkNavigation" value="Logout" action="#{autenticadorMbean.logout()}" />
+                    </h:panelGroup>
+                </h:panelGroup>
+            </header>
+
+            <!-- Bloco de mensagens -->
+
+            <h:panelGroup styleClass="messages"  layout="block"  rendered="#{listMessagesSystemControl.messagesSession}">
+                <ui:insert name="messages">
+                    <ui:include src="/system_message.xhtml"/>
+                </ui:insert>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="sidebar" rendered="#{autenticadorMbean.usuarioSessao.id != 0 and autenticadorMbean.isAdministrador()}">
+                <ui:insert name="sidebar">
+                    <ui:include src="/sidebar.xhtml"/>
+                </ui:insert>
+            </h:panelGroup >
+
+            <!-- Conteúdo principal -->
+            <section id="content-container">
+                <section id="content">
+                    <ui:insert name="content">
+
+                    </ui:insert>
+                </section>
+            </section>
+
+    <!--        &lt;!&ndash; Rodapé &ndash;&gt;-->
+    <!--        <footer id="footer" class="#{autenticadorMbean.usuarioSessao.id == 0 ? 'usuarioDeslogadoHeaderFooter' : 'usuarioLogadoHeaderFooter'}">-->
+    <!--            <p>Meu Rodapé</p>-->
+    <!--        </footer>-->
+        </h:form>
+    </h:body>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Impede a exibição de barras de rolagem */
+            font-family: 'Nunito Sans', sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a:focus,
+        a:active {
+            outline: none;
+        }
+
+        #container {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+            overflow: hidden; /* Impede a exibição de barras de rolagem */
+        }
+
+        #header, #footer {
+            background-color: #f0f0f0;
+            grid-column: 1 / span 1;
+            z-index: 10; /* Adicione um índice z maior para manter o header e o footer acima dos outros elementos */
+        }
+
+        .messages {
+            background: linear-gradient(to right, #EBFDEE, #9DBFA0 , #D9DEDB 40% 60%, #9DBFA0, #EBFDEE);
+            grid-column: 1 / span 1;
+            z-index: 1000; /* Adicione um índice z maior para manter as mensagens acima dos outros elementos */
+            text-align: center;
+        }
+
+        .sidebar {
+            background-color: #8AA88D;
+            box-shadow: 0 6px 10px 2px rgba(52, 64, 53, 0.6), 6px 6px 10px 2px rgba(52, 64, 53, 0.6);
+            border-radius: 5px;
+            z-index: 1000;
+            border-top: 1px solid #607562;
+            border-right: 1px solid #607562;
+            border-bottom: 1px solid #607562;
+            position: absolute;
+            top: 10%;
+            left: 0;
+            height: 170px;
+            text-wrap: nowrap;
+        }
+
+        #content-container {
+            background: linear-gradient(to right, #EBFDEE, #9DBFA0 18% 82%, #EBFDEE);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: inherit;
+            overflow: auto;
+        }
+
+        #content {
+            width: 8.27in;
+            height: 100%;
+            background-color: #EBFDEE;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            box-shadow: 0 0 10px 7px rgba(52, 64, 53, 0.6);
+        }
+
+        /*#footer {*/
+        /*    text-align: center;*/
+        /*    background-color: #4A5C37;*/
+        /*}*/
+
+        .blocoUsuario {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #8AA88D;
+            padding: 5px 15px;
+            color: #2A332B;
+            font-weight: bold;
+            border-bottom: 1px solid #607562;
+            font-size: 13px;
+        }
+
+        #blocoNomeApp {
+            background-color: #344035;
+            padding: 5px 0 0 15px;
+            color: #E5F1E8;
+            font-weight: bold;
+            border-bottom: 3px solid #AC6DD1;
+            font-size: 15px;
+        }
+
+        .buttonsTables {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #758F78;
+            color: #2A332B;
+            border: none;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .buttonsTables:hover {
+            color: #EBFDEE;
+        }
+
+        .buttonsTables:focus,
+        .buttonsTables:active {
+            outline: none;
+        }
+
+
+
+        input[type="text"], input[type="password"] {
+            border: 1px solid #2A332B;
+            border-radius: 3px;
+            color: #2A332B;
+            padding: 5px;
+            font-family: "Lato Semibold", sans-serif;
+            font-size: 15px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        select {
+            padding: 2px;
+            font-family: "Lato", sans-serif;
+            font-size: 15px;
+            color: #2A332B;
+            border-radius: 3px;
+            border: 1px solid #2A332B;
+        }
+
+        table label {
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        table caption {
+            border: 1px solid #2A332B;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            background-color: #344035;
+            color: #EBFDEE;
+            font-family: "Lato", sans-serif;
+            font-weight: 400;
+            font-size: 15px;
+            padding: 3px;
+        }
+
+        div.blocoTables {
+            width: 95%;
+            margin-top: 20px;
+        }
+
+        div.blocoTables table caption {
+            border-radius: 0;
+        }
+
+        div.blocoTables .informationTable {
+            width: 100%;
+            text-align: center;
+            padding: 5px 0;
+            font-size: 14px;
+            font-weight: 800;
+            background-color: #AC6DD1;
+            border-radius: 5px 5px 0 0;
+            color: #E5F1E8;
+            position: relative;
+        }
+
+        div.blocoTables .informationTable img {
+            width: 20px;
+            position: absolute;
+            left: 10px;
+        }
+
+        table.tablesBusca {
+            width: 70%;
+            background-color: #9DBFA0;
+            border-radius: 0 0 5px 5px;
+            border: 1px solid #2A332B;
+            border-top: none;
+            padding: 10px;
+        }
+
+        table.tablesBusca label {
+            font-weight: bold;
+        }
+
+        table.tablesList {
+            width: 100%;
+            background-color: #9DBFA0;
+            border-radius: 0 0 5px 5px;
+            border: 1px solid #2A332B;
+            border-collapse: collapse;
+            color: #2A332B;
+            font-family: "Lato", sans-serif;
+            margin-bottom: 20px;
+        }
+
+        table.tablesList th {
+            text-align: left;
+            background-color: #758F78;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        table.tablesList td {
+            text-align: left;
+            padding: 8px 5px 5px 5px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .linhaPar {
+            background-color: #EBFDEE;
+        }
+
+        .linhaImpar {
+            background-color: #C9DECC;
+        }
+
+        .linkNavigation {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #758F78;
+            color: #2A332B;
+            border: none;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .linkNavigation:hover {
+            background-color: #EBFDEE;
+        }
+
+        .linkNavigation:focus,
+        .linkNavigation:active {
+            outline: none;
+        }
+
+    </style>
+    <script type="text/javascript">
+        function toogleCheckbox(idCheckbox) {
+            checkbox = document.getElementById("form:" + idCheckbox)
+            checkbox.checked = !checkbox.checked
+        }
+    </script>
+</f:view>
 </html>
 
 

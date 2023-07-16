@@ -1,12 +1,128 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-<f:view>
-    <h:form>
-        <h:commandButton value="logout" action="#{autenticadorMbean.logout()}"/>
-    </h:form>
-</f:view>
-</html>
+<ui:composition template="template/template_modelo.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <h:panelGroup layout="block" styleClass="formListagem" style="height: 100%; width: 100%;">
+            <h:panelGroup layout="block" rendered="#{pessoaSalarioMbean.isAdministrador()}">
+                <table class="tablesBusca">
+                    <caption>Busca Funcionários Com Salários Calculados</caption>
+                    <tr>
+                        <td>
+                            <h:selectBooleanCheckbox id="checkNome" value="#{pessoaSalarioMbean.restricoesBusca.nome}"/>
+                            <h:outputLabel onclick="toogleCheckbox('checkNome');" value="Nome:" for="nomeBusca"/>
+                        </td>
+                        <td>
+                            <h:inputText styleClass="inputNome" value="#{pessoaSalarioMbean.parametrosBusca.nome}" id="nomeBusca"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h:selectBooleanCheckbox id="checkCargo" value="#{pessoaSalarioMbean.restricoesBusca.cargo}"/>
+                            <h:outputLabel onclick="toogleCheckbox('checkCargo');" value="Cargo:" for="cargoBusca"/>
+                        </td>
+                        <td>
+                            <h:selectOneMenu value="#{pessoaSalarioMbean.parametrosBusca.cargo}" id="cargoBusca">
+                                <f:selectItem itemLabel="-- Selecione --" itemValue="0"/>
+                                <f:selectItems value="#{pessoaSalarioMbean.cargosCombo}"/>
+                            </h:selectOneMenu>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h:selectBooleanCheckbox id="checkEstado" value="#{pessoaSalarioMbean.restricoesBusca.estado}"/>
+                            <h:outputLabel onclick="toogleCheckbox('checkEstado');" value="Estado:" for="estadoBusca"/>
+                        </td>
+                        <td>
+                            <h:selectOneMenu value="#{pessoaSalarioMbean.parametrosBusca.estado}" id="estadoBusca">
+                                <f:selectItem itemLabel="-- Selecione --" itemValue="0"/>
+                                <f:selectItems value="#{pessoaSalarioMbean.estadosCombo}"/>
+                            </h:selectOneMenu>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding-top: 10px;">
+                            <h:commandButton styleClass="buttonsTables" id="botaoBuscar" value="Buscar" action="#{pessoaSalarioMbean.buscar()}">
+                                <f:ajax event="click" render="listaPessoas" execute="@form"/>
+                            </h:commandButton>
+                            <h:commandButton styleClass="buttonsTables" id="botaoContabilizar" value="Contabiliza Salários" action="#{pessoaSalarioMbean.contabilizaSalarios()}">
+                                <f:ajax event="click" render="@form" execute="@form"/>
+                            </h:commandButton>
+                        </td>
+                    </tr>
+                </table>
+            </h:panelGroup>
+
+            <h:panelGroup layout="block" styleClass="blocoTables">
+                <div class="informationTable">
+                    <h:graphicImage value="resources/icon-information.png" alt="informations"/>
+                    <span>Salários Não Calculados: </span>
+                    <h:outputText value="#{pessoaSalarioMbean.salariosNaoCalculados}"/>
+                    <h:commandLink target="_blank" value="Exportar para PDF" action="#{pessoaSalarioMbean.exportToPDF()}"/>
+                </div>
+                <h:dataTable styleClass="tablesList" value="#{pessoaSalarioMbean.pessoas}" var="pessoa" id="listaPessoas" rowClasses="linhaPar,linhaImpar">
+
+                    <f:facet name="caption">
+                        <h:outputText value="Lista de Funcionários"/>
+                    </f:facet>
+
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Nome"/>
+                        </f:facet>
+                        <h:outputText value="#{pessoa.nome}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Estado"/>
+                        </f:facet>
+                        <h:outputText value="#{pessoa.endereco.cidade.estado.uf}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Cidade"/>
+                        </f:facet>
+                        <h:outputText value="#{pessoa.endereco.cidade.nome}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Cargo"/>
+                        </f:facet>
+                        <h:outputText value="#{pessoa.cargo.nome}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Salário"/>
+                        </f:facet>
+                        <h:outputText rendered="#{pessoa.salarioCalculado}" value="#{pessoa.cargo.salario}"/>
+                    </h:column>
+
+                    <h:column rendered="#{autenticadorMbean.isAdministrador()}">
+
+                    </h:column>
+
+
+                </h:dataTable>
+            </h:panelGroup>
+        </h:panelGroup>
+        <style>
+            .formListagem {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding-top: 20px;
+                font-size: 15px;
+            }
+
+            .inputNome {
+                width: 95%;
+                padding: 3px !important;
+            }
+        </style>
+    </ui:define>
+</ui:composition>

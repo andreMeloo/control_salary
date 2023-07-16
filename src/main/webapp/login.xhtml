@@ -1,20 +1,52 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-<f:view>
-    <h:form>
-        <h:outputLabel value="Login" for="loginUser"/>
-        <h:inputText id="loginUser" value="#{autenticadorMbean.loginForm}"/>
-        <br/>
-        <h:outputLabel value="Senha" for="senhaUser"/>
-        <h:inputSecret id="senhaUser" value="#{autenticadorMbean.senhaForm}"/>
-        <br/>
-        <h:commandButton value="Login" action="#{autenticadorMbean.autenticar()}">
-            <f:ajax execute="@form" render="@form"/>
-        </h:commandButton>
-    </h:form>
-</f:view>
-</html>
+<ui:composition template="template/template_modelo.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <h:panelGroup layout="block" id="loginForm">
+            <table class="loginTable">
+                <tr>
+                    <th>
+                        <h:outputLabel styleClass="labelsLogin" value="Login:" for="loginUser"/>
+                    </th>
+                    <td>
+                        <h:inputText id="loginUser" styleClass="inputsLogin inputsSistem" value="#{autenticadorMbean.loginForm}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <h:outputLabel styleClass="labelsLogin" value="Senha:" for="senhaUser"/>
+                    </th>
+                    <td>
+                        <h:inputSecret id="senhaUser" styleClass="inputsLogin inputsSistem" value="#{autenticadorMbean.senhaForm}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center; padding-top: 10px;">
+                        <h:commandButton styleClass="buttonsTables" value="Login" action="#{autenticadorMbean.autenticar()}">
+                            <f:ajax event="click" execute="@form" render="@form"/>
+                        </h:commandButton>
+                    </td>
+                </tr>
+            </table>
+        </h:panelGroup>
+        <style>
+            .loginTable {
+                background-color: #9DBFA0;
+                font-size: 14px;
+                padding: 10px;
+                border-radius: 5px;
+            }
+
+
+            .labelsLogin {
+                font-weight: 700;
+            }
+
+            .inputsLogin {
+                background-color: #EBFDEE;
+            }
+        </style>
+    </ui:define>
+</ui:composition>
