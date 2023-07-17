@@ -20,11 +20,17 @@ public class SessionFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         Object atributo = httpRequest.getSession().getAttribute("usuarioAutenticado");
+        String path = httpRequest.getRequestURI();
         // Verifica se o usuário possui uma sessão ativa
         if (atributo == null && httpRequest.getRequestURI().endsWith("/login.xhtml")) {
             chain.doFilter(request, response);
             return;
         } else if (atributo == null && !httpRequest.getRequestURI().endsWith("/login.xhtml")) {
+            if (path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".gif")) {
+                chain.doFilter(request, response);
+                return;
+            }
+
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/login.xhtml");
             return;
         } else if (atributo != null && httpRequest.getRequestURI().endsWith("/login.xhtml")) {

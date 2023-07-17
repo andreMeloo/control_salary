@@ -5,17 +5,20 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core">
 
         <c:forEach items="#{listMessagesSystemControl.messagesSystem}" var="mensagem">
-            <h:graphicImage value="resources/icon_erro.png" alt="icone aviso!" rendered="#{mensagem.erro}"/>
-            <h:graphicImage value="resources/icon_sucess.png" alt="icone aviso!" rendered="#{mensagem.sucesso}"/>
-            <h:outputText value="#{mensagem.mensagem}" styleClass="#{mensagem.sucesso ? 'mensagemSucesso' : 'mensagemErro'}"/>
+            <div style="display: flex; align-items: center;">
+                <h:graphicImage value="myResources/icon_erro.png" alt="icone aviso!" rendered="#{mensagem.erro}"/>
+                <h:graphicImage value="myResources/icon_sucess.png" alt="icone aviso!" rendered="#{mensagem.sucesso}"/>
+                <h:outputText value="#{mensagem.mensagem}" styleClass="#{mensagem.sucesso ? 'mensagemSucesso' : 'mensagemErro'}"/>
+            </div>
         </c:forEach>
-        <h:commandLink style="cursor: pointer; font-size: 12px; margin-left: 35px;"
+        <h:commandLink style="cursor: pointer; font-size: 11px;"
                 value="(X) Fechar Mensagem" action="#{listMessagesSystemControl.fechaBlocoMensagens()}" >
             <f:ajax render="@form"/>
         </h:commandLink>
     <style>
         .messages img {
             width: 17px;
+            margin-right: 10px;
         }
 
         .messages .mensagemErro {

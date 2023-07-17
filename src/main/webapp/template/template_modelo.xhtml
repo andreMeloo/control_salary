@@ -17,7 +17,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&amp;display=swap" rel="stylesheet"/>
     </h:head>
     <h:body id="body">
-        <h:form id="container">
+        <h:form id="container" styleClass="#{listMessagesSystemControl.messagesSession ? 'comBlocoMessage' : 'semBlocoMessage'}">
             <header id="header">
                 <div id="blocoNomeApp">
                     <span>Sistema Salary v1.0 - Developed by André Melo</span>
@@ -78,10 +78,17 @@
         }
 
         #container {
-            display: grid;
-            grid-template-rows: auto 1fr;
             height: 100vh;
             overflow: hidden; /* Impede a exibição de barras de rolagem */
+            display: grid;
+        }
+
+        .comBlocoMessage {
+            grid-template-rows: auto auto 1fr;
+        }
+
+        .semBlocoMessage {
+            grid-template-rows: auto 1fr;
         }
 
         #header, #footer {
@@ -95,6 +102,10 @@
             grid-column: 1 / span 1;
             z-index: 1000; /* Adicione um índice z maior para manter as mensagens acima dos outros elementos */
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .sidebar {
@@ -117,7 +128,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: inherit;
+            height: 100%;
             overflow: auto;
         }
 
@@ -242,13 +253,10 @@
             background-color: #AC6DD1;
             border-radius: 5px 5px 0 0;
             color: #E5F1E8;
-            position: relative;
-        }
-
-        div.blocoTables .informationTable img {
-            width: 20px;
-            position: absolute;
-            left: 10px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
         }
 
         table.tablesBusca {
@@ -323,7 +331,7 @@
     </style>
     <script type="text/javascript">
         function toogleCheckbox(idCheckbox) {
-            checkbox = document.getElementById("form:" + idCheckbox)
+            checkbox = document.getElementById("container:" + idCheckbox)
             checkbox.checked = !checkbox.checked
         }
     </script>

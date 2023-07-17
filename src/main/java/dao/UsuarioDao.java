@@ -2,28 +2,17 @@ package dao;
 
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceException;
+import model.Pessoa;
+import model.PessoaSalario;
 import model.Usuario;
 import util.DaoException;
+import util.messagesSystem.MensagemSistema;
+import util.messagesSystem.TipoMensagem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class UsuarioDao extends AbstractDao {
-
-    public void criarPessoaUsuario(Usuario usuario) {
-        try {
-            getEntityManager().getTransaction().begin();
-            getEntityManager().persist(usuario.getPessoa());
-            getEntityManager().persist(usuario);
-            getEntityManager().getTransaction().commit();
-        } catch (PersistenceException error) {
-            if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
-                getEntityManager().getTransaction().rollback();
-            }
-            error.printStackTrace();
-            throw new DaoException("Erro ao criar um usuário, por favor contate o suporte para maiores detalhes.", error);
-        }
-    }
 
     public void alterar(Usuario usuario) {
         try {
@@ -34,8 +23,9 @@ public class UsuarioDao extends AbstractDao {
             if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
                 getEntityManager().getTransaction().rollback();
             }
-            error.printStackTrace();
-            throw new DaoException("Erro ao tentar alterar o usuário, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao tentar alterar o usuário, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
     }
 
@@ -44,21 +34,11 @@ public class UsuarioDao extends AbstractDao {
         try {
             usuario = getEntityManager().find(Usuario.class, id);
         } catch (Exception error) {
-            error.printStackTrace();
-            throw new DaoException("Erro ao buscar um usuário, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao buscar um usuário, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
         return usuario;
-    }
-
-    public List<Usuario> findAll() {
-        List<Usuario> usuarios = new ArrayList<>();
-        try {
-            usuarios = getEntityManager().createQuery("SELECT u FROM Usuario u ORDER BY u.pessoa.nome", Usuario.class).getResultList();
-        } catch (Exception error) {
-            error.printStackTrace();
-            throw new DaoException("Erro ao buscar usuários, por favor contate o suporte para maiores detalhes.", error);
-        }
-        return usuarios;
     }
 
     public Usuario findByUsername(String login) {
@@ -71,8 +51,26 @@ public class UsuarioDao extends AbstractDao {
         } catch (NoResultException nre) {
             usuario = null;
         } catch (Exception error) {
-            error.printStackTrace();
-            throw new DaoException("Erro ao buscar um usuário pelo login, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao localizar o login no sistema, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
+        }
+        return usuario;
+    }
+
+    public Usuario findByPessoa(Integer idPessoa) {
+        Usuario usuario = new Usuario();
+        try {
+            String sql = "SELECT u FROM Usuario u WHERE u.pessoa.id = :idPessoa";
+            usuario = getEntityManager().createQuery(sql, Usuario.class)
+                    .setParameter("idPessoa", idPessoa)
+                    .getSingleResult();
+        } catch (NoResultException nre) {
+            usuario = null;
+        } catch (Exception error) {
+            mensagemErro = "Erro ao realizar a busca, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
         return usuario;
     }

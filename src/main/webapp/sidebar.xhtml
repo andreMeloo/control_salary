@@ -8,21 +8,26 @@
         </div>
         <ul id="ulSidebar">
             <li class="liSidebar">
-                <h:commandLink id="cadastroUser"  styleClass="linkNavigation" value="Cadastro de Usuário" disabled="true">
-                    <f:ajax event="click" execute="@this" render="@all"/>
+                <h:commandLink  id="cadastroUser" styleClass="linkNavigation #{pessoaSalarioMbean.getbotaoNavegacaoClicado() == 'cadastroUser' ? 'botaoClicado' : ''}">
+                    <f:ajax event="click" execute="@this" render="@form" listener="#{cadastroUsuarioMBean.entrarCadastroDeUsuario()}"/>
+                    <div style="display: flex; align-items: center; justify-content: space-around;">
+                        <h:outputText value="Cadastrar Usuário"/>
+                        <h:graphicImage style="margin-left: 5px" width="18" value="myResources/cadastro_pessoa.png" alt="Cadastro de Pessoa"/>
+                    </div>
                 </h:commandLink>
             </li>
             <li class="liSidebar">
-                <h:commandLink id="cargosSec" styleClass="linkNavigation" value="Seção de Cargos" disabled="true">
+                <h:commandButton id="cargosSec" styleClass="linkNavigation #{pessoaSalarioMbean.getbotaoNavegacaoClicado() == 'cargosSec' ? 'botaoClicado' : ''}"
+                                 value="Seção de Cargos" disabled="true">
                     <f:ajax event="click" execute="@this" render="@all"/>
-                </h:commandLink>
+                </h:commandButton>
             </li>
             <li class="liSidebar">
-                <h:commandLink id="listagemFunc"
+                <h:commandButton id="listagemFunc"
                                styleClass="linkNavigation #{pessoaSalarioMbean.getbotaoNavegacaoClicado() == 'listagemFunc' ? 'botaoClicado' : ''}"
                                value="Lista de Funcionários" action="#{pessoaSalarioMbean.entrarListagemFuncionarios()}">
                     <f:ajax event="click" execute="@this" render="@all"/>
-                </h:commandLink>
+                </h:commandButton>
             </li>
         </ul>
     </li>

@@ -2,6 +2,8 @@ package dao;
 
 import model.Cidade;
 import util.DaoException;
+import util.messagesSystem.MensagemSistema;
+import util.messagesSystem.TipoMensagem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +17,9 @@ public class CidadeDao extends AbstractDao {
                     .setParameter("idEstado", idEstado)
                     .getResultList();
         } catch (Exception error) {
-            error.printStackTrace();
-            throw new DaoException("Erro ao buscar cidades, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao buscar cidades, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
         return cidades;
     }

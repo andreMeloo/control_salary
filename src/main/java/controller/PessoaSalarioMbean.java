@@ -11,6 +11,7 @@ import jakarta.faces.event.ActionEvent;
 import jakarta.faces.model.SelectItem;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.Setter;
 import model.*;
@@ -18,6 +19,8 @@ import net.sf.jasperreports.engine.*;
 import util.DaoException;
 import util.ValidatorUtil;
 import util.messagesSystem.ListMessagesSystemControl;
+import util.messagesSystem.MensagemSistema;
+import util.messagesSystem.TipoMensagem;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,11 +53,11 @@ public class PessoaSalarioMbean extends AbstractControllerBean implements Serial
         Integer estado;
     }
 
-    Usuario usuarioLogadoSistema;
-    List<Pessoa> pessoas;
-    int salariosNaoCalculados;
-    ParametrosBusca parametrosBusca;
-    RestricoesBusca restricoesBusca;
+    private Usuario usuarioLogadoSistema;
+    private List<Pessoa> pessoas;
+    private int salariosNaoCalculados;
+    private ParametrosBusca parametrosBusca;
+    private RestricoesBusca restricoesBusca;
 
     public void init() {
         usuarioLogadoSistema = getUsuarioSessao();
@@ -62,6 +65,7 @@ public class PessoaSalarioMbean extends AbstractControllerBean implements Serial
         parametrosBusca = new ParametrosBusca();
         restricoesBusca = new RestricoesBusca();
         salariosNaoCalculados = 0;
+        setMessagesSystem(new ListMessagesSystemControl());
         setbotaoNavegacaoClicado(BOTAO_NAVEGACAO_LISTA_FUNCIONARIOS);
         populaLista();
     }
@@ -112,19 +116,25 @@ public class PessoaSalarioMbean extends AbstractControllerBean implements Serial
     public String buscar() {
         if (!isTransacaoEmAndamento()) {
             validarDados();
+            if (hasMessages())
+                return null;
             // logica de exibir mensagens
             try {
                 usuarioLogadoSistema = getUsuarioSessao();
                 if (ValidatorUtil.isNotEmpty(usuarioLogadoSistema))
                     populaLista();
             } catch (Exception erro) {
-                throw new DaoException("Erro ao buscar lista de pessoas com salários calculados, contate o administrador do sistema para maiores informações", erro);
+                String mensagemErro = "Erro ao buscar lista de pessoas com salários calculados, contate o administrador do sistema para maiores informações";
+                getMessagesSystem().addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+                throw new DaoException(mensagemErro, erro);
             }
             if (ValidatorUtil.isEmpty(pessoas)) {
-                // logica mesngem busca sem resultados
+                getMessagesSystem().addMensagem(new MensagemSistema(MensagemSistema.BUSCA_SEM_RESULTADOS, TipoMensagem.ERROR));
+                return null;
             }
             return null;
         }
+        getMessagesSystem().addMensagem(new MensagemSistema(MensagemSistema.TRANSACAO_EM_ANDAMENTO, TipoMensagem.ERROR));
         return null;
     }
 
@@ -167,16 +177,21 @@ public class PessoaSalarioMbean extends AbstractControllerBean implements Serial
     }
 
     private void validarDados() {
+        List<MensagemSistema> mensagemSistemas = new ArrayList<>();
         if (restricoesBusca.isNome() && ValidatorUtil.isEmpty(parametrosBusca.getNome())) {
-            // logica mensagem campo obrigatório
+            mensagemSistemas.add(new MensagemSistema("Nome: " + MensagemSistema.CAMPO_OBRIGATORIO, TipoMensagem.ERROR));
         }
 
         if (restricoesBusca.isCargo() && ValidatorUtil.isEmpty(parametrosBusca.getCargo())) {
-            // logica mensagem campo obrigatório
+            mensagemSistemas.add(new MensagemSistema("Cargo: " + MensagemSistema.CAMPO_OBRIGATORIO, TipoMensagem.ERROR));
         }
 
         if (restricoesBusca.isEstado() && ValidatorUtil.isEmpty(parametrosBusca.getEstado())) {
-            // logica mensagem campo obrigatório
+            mensagemSistemas.add(new MensagemSistema("Estado: " + MensagemSistema.CAMPO_OBRIGATORIO, TipoMensagem.ERROR));
+        }
+
+        if (ValidatorUtil.isNotEmpty(mensagemSistemas)) {
+            getMessagesSystem().addMensagem(mensagemSistemas);
         }
     }
 
@@ -184,7 +199,7 @@ public class PessoaSalarioMbean extends AbstractControllerBean implements Serial
     public String contabilizaSalarios() {
         if (!isTransacaoEmAndamento()) {
             if (salariosNaoCalculados == 0) {
-                //mensagem todos os salários já calculados
+                getMessagesSystem().addMensagem(new MensagemSistema("Todos os salários da lista já estão calculados.", TipoMensagem.ERROR));
                 return null;
             }
 
@@ -204,39 +219,49 @@ public class PessoaSalarioMbean extends AbstractControllerBean implements Serial
                     psSalarioDao.contabilizarSalarios(pessoaSalarios);
                 }
             } catch (Exception error) {
-                throw new DaoException("Erro ao contabilizar salários", error);
+                String mensagemErro = "Erro ao contabilizar salários, contate o administrador do sistema para maiores informações";
+                getMessagesSystem().addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+                throw new DaoException(mensagemErro, error);
             } finally {
                 psSalarioDao.close();
             }
             init();
+            getMessagesSystem().addMensagem(new MensagemSistema(MensagemSistema.CALCULO_REALIZADO, TipoMensagem.SUCCESS));
             populaLista();
             return null;
         }
+        getMessagesSystem().addMensagem(new MensagemSistema(MensagemSistema.TRANSACAO_EM_ANDAMENTO, TipoMensagem.ERROR));
         return null;
     }
 
-    public void exportToPDF() throws JRException, IOException {
+    public void exportToPDF() {
         InputStream stream = AbstractControllerBean.class.getResourceAsStream("/reports/pessoas_salarios.jrxml");
-        JasperReport reportPath = JasperCompileManager.compileReport(stream);
+        try {
+            JasperReport reportPath = JasperCompileManager.compileReport(stream);
 
-        JasperPrint jasperPrint = JasperFillManager.fillReport(reportPath, null, new PessoaDataSource(pessoas));
+            JasperPrint jasperPrint = JasperFillManager.fillReport(reportPath, null, new PessoaDataSource(pessoas));
 
-        // Exportar para PDF em memória
-        byte[] pdfBytes = JasperExportManager.exportReportToPdf(jasperPrint);
+            // Exportar para PDF em memória
+            byte[] pdfBytes = JasperExportManager.exportReportToPdf(jasperPrint);
 
-        // Enviar o relatório em PDF para o navegador
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        ExternalContext externalContext = facesContext.getExternalContext();
-        HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
-        response.setContentType("application/pdf");
-        response.setContentLength(pdfBytes.length);
-        response.setHeader("Content-Disposition", "inline; filename=\"relatorio_funcionarios_salarios.pdf\"");
+            // Enviar o relatório em PDF para o navegador
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            ExternalContext externalContext = facesContext.getExternalContext();
+            HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
+            response.setContentType("application/pdf");
+            response.setContentLength(pdfBytes.length);
+            response.setHeader("Content-Disposition", "inline; filename=\"relatorio_funcionarios_salarios.pdf\"");
 
-        OutputStream outputStream = response.getOutputStream();
-        outputStream.write(pdfBytes);
-        outputStream.flush();
-        outputStream.close();
-
-        facesContext.responseComplete();
+            OutputStream outputStream = response.getOutputStream();
+            outputStream.write(pdfBytes);
+            outputStream.flush();
+            outputStream.close();
+            facesContext.responseComplete();
+            getMessagesSystem().addMensagem(new MensagemSistema("Exportação feita com sucesso! Arquivo gerado e pronto pra ser visualizado / feito download.", TipoMensagem.SUCCESS));
+        } catch (JRException | IOException errorArquivo) {
+            String mensagemErro = "Erro ao gerar arquivo PDF: Não foi possível encontrar o arquivo no caminho espécificado / Arquivo Comrrompido / Não foi possível gerar o PDF";
+            getMessagesSystem().addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, errorArquivo);
+        }
     }
 }

@@ -10,9 +10,11 @@ import lombok.Getter;
 import lombok.Setter;
 import model.TipoUsuario;
 import model.Usuario;
+import util.DaoException;
 import util.ValidatorUtil;
 import util.messagesSystem.ListMessagesSystemControl;
 import util.messagesSystem.MensagemSistema;
+import util.messagesSystem.TipoMensagem;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -27,9 +29,11 @@ public class AbstractControllerBean implements Serializable {
     // Caminhos
     protected static final String PAGINA_PESSOAS_SALARIOS = "/pessoas_salario.xhtml";
     protected static final String PAGINA_LOGIN = "/login.xhtml";
+    protected static final String PAGINA_CADASTRO_PESSOA = "/cadastro_pessoa.xhtml";
 
     // Botões
     protected static final String BOTAO_NAVEGACAO_LISTA_FUNCIONARIOS = "listagemFunc";
+    protected static final String BOTAO_NAVEGACAO_CADASTRO_USUARIO = "cadastroUser";
 
 
     private String botaoNavegacaoClicado;
@@ -37,6 +41,8 @@ public class AbstractControllerBean implements Serializable {
     private Usuario usuarioSessao;
 
     private List<MensagemSistema> mensagensEmFila;
+
+    private ListMessagesSystemControl messagesSystem;
 
     public String getbotaoNavegacaoClicado() {
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
@@ -110,7 +116,9 @@ public class AbstractControllerBean implements Serializable {
             }
             return daoInstance;
         } catch (Exception e) {
-            return null;
+            String mensagemErro = "Ocorreu um erro ao tentar iniciar uma instância de DAO, contate o adiministrador do sistema para maiores informações";
+            messagesSystem.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, e);
         }
     }
 
@@ -124,8 +132,9 @@ public class AbstractControllerBean implements Serializable {
                 return transactionStatus == Status.STATUS_ACTIVE || transactionStatus == Status.STATUS_MARKED_ROLLBACK;
             }
         } catch (Exception e) {
-            // Tratar exceção
-            return false;
+            String mensagemErro = "Ocorreu um erro ao verificar a trasação em andamento, contate o adiministrador do sistema para maiores informações";
+            messagesSystem.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, e);
         }
         return false;
     }

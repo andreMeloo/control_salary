@@ -7,7 +7,7 @@
         <h:panelGroup layout="block" styleClass="formListagem" style="height: 100%; width: 100%;">
             <h:panelGroup layout="block" rendered="#{pessoaSalarioMbean.isAdministrador()}">
                 <table class="tablesBusca">
-                    <caption>Busca Funcionários Com Salários Calculados</caption>
+                    <caption>Busca Funcionários Cadastrados</caption>
                     <tr>
                         <td>
                             <h:selectBooleanCheckbox id="checkNome" value="#{pessoaSalarioMbean.restricoesBusca.nome}"/>
@@ -44,7 +44,7 @@
                     <tr>
                         <td colspan="2" style="text-align: center; padding-top: 10px;">
                             <h:commandButton styleClass="buttonsTables" id="botaoBuscar" value="Buscar" action="#{pessoaSalarioMbean.buscar()}">
-                                <f:ajax event="click" render="listaPessoas" execute="@form"/>
+                                <f:ajax event="click" render="@form" execute="@form"/>
                             </h:commandButton>
                             <h:commandButton styleClass="buttonsTables" id="botaoContabilizar" value="Contabiliza Salários" action="#{pessoaSalarioMbean.contabilizaSalarios()}">
                                 <f:ajax event="click" render="@form" execute="@form"/>
@@ -56,10 +56,17 @@
 
             <h:panelGroup layout="block" styleClass="blocoTables">
                 <div class="informationTable">
-                    <h:graphicImage value="resources/icon-information.png" alt="informations"/>
-                    <span>Salários Não Calculados: </span>
-                    <h:outputText value="#{pessoaSalarioMbean.salariosNaoCalculados}"/>
-                    <h:commandLink target="_blank" value="Exportar para PDF" action="#{pessoaSalarioMbean.exportToPDF()}"/>
+                    <h:graphicImage style="margin-left: 10px;" width="20" value="myResources/icon-information.png" alt="informations"/>
+                    <div style="margin-left: 95px;">
+                        <span>Salários Não Calculados: </span>
+                        <h:outputText value="#{pessoaSalarioMbean.salariosNaoCalculados}"/>
+                    </div>
+                    <div style="margin-right: 10px">
+                        <h:commandLink style="display: flex; align-items: center; justify-content: center; flex-direction: row;" target="_blank" action="#{pessoaSalarioMbean.exportToPDF()}">
+                            <h:graphicImage width="20" value="myResources/export_pdf.png" alt="informations"/>
+                            <h:outputText style="font-family: 'Lato Light', serif; font-size: 12px" value="Exportar para PDF"/>
+                        </h:commandLink>
+                    </div>
                 </div>
                 <h:dataTable styleClass="tablesList" value="#{pessoaSalarioMbean.pessoas}" var="pessoa" id="listaPessoas" rowClasses="linhaPar,linhaImpar">
 
@@ -103,9 +110,12 @@
                     </h:column>
 
                     <h:column rendered="#{autenticadorMbean.isAdministrador()}">
-
+                        <div style="display: flex; align-items: center; justify-content: space-around;">
+                            <h:commandLink action="#{cadastroUsuarioMBean.preAlterarPessoa(pessoa)}">
+                                <h:graphicImage width="20" value="myResources/editar_pessoa.png"/>
+                            </h:commandLink>
+                        </div>
                     </h:column>
-
 
                 </h:dataTable>
             </h:panelGroup>

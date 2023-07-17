@@ -6,6 +6,8 @@ import model.Pessoa;
 import model.PessoaSalario;
 import util.DaoException;
 import util.SqlUtil;
+import util.messagesSystem.MensagemSistema;
+import util.messagesSystem.TipoMensagem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +25,9 @@ public class PessoaSalarioDao extends AbstractDao{
             if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
                 getEntityManager().getTransaction().rollback();
             }
-            error.printStackTrace();
-            throw new DaoException("Erro ao criar um usuário, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao criar um usuário, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
     }
 
@@ -37,8 +40,9 @@ public class PessoaSalarioDao extends AbstractDao{
             if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
                 getEntityManager().getTransaction().rollback();
             }
-            error.printStackTrace();
-            throw new DaoException("Erro ao remover a pessoaSalario, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao remover a pessoaSalario, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
     }
 
@@ -52,8 +56,9 @@ public class PessoaSalarioDao extends AbstractDao{
         } catch (NoResultException nre) {
             pessoaSalario = null;
         } catch (Exception error) {
-            error.printStackTrace();
-            throw new DaoException("Erro ao realizar a busca, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao realizar a busca, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
         return pessoaSalario;
     }
@@ -63,8 +68,9 @@ public class PessoaSalarioDao extends AbstractDao{
         try {
             PessoasSalarios = getEntityManager().createQuery("SELECT ps FROM PessoaSalario ps WHERE ps.pessoa.id IN " + SqlUtil.gerarStringInSQL(pessoas) + " ORDER BY ps.pessoa.nome", PessoaSalario.class).getResultList();
         } catch (Exception error) {
-            error.printStackTrace();
-            throw new DaoException("Erro ao buscar pessoas, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao buscar pessoas, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
         return PessoasSalarios;
     }
@@ -78,8 +84,9 @@ public class PessoaSalarioDao extends AbstractDao{
         } catch (NoResultException nre) {
             numPessoas = 0L;
         } catch (Exception error) {
-            error.printStackTrace();
-            throw new DaoException("Erro ao realizar a busca, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao realizar a busca, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
         return numPessoas.intValue();
     }

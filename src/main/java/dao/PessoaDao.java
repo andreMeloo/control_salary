@@ -6,38 +6,61 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
 import model.Pessoa;
+import model.Usuario;
 import util.DaoException;
+import util.messagesSystem.MensagemSistema;
+import util.messagesSystem.TipoMensagem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PessoaDao extends AbstractDao {
 
-    public void remover(Pessoa pessoa) {
+    public void criarPessoaUsuario(Pessoa pessoa) {
         try {
             getEntityManager().getTransaction().begin();
+            getEntityManager().persist(pessoa);
+            getEntityManager().persist(pessoa.getUsuario());
+            getEntityManager().getTransaction().commit();
+        } catch (PersistenceException error) {
+            if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
+                getEntityManager().getTransaction().rollback();
+            }
+            mensagemErro = "Erro ao cadastrar uma pessoa, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
+        }
+    }
+
+    public void removerPessoaUsuario(Pessoa pessoa) {
+        try {
+            getEntityManager().getTransaction().begin();
+            getEntityManager().remove(pessoa.getUsuario());
             getEntityManager().remove(pessoa);
             getEntityManager().getTransaction().commit();
         } catch (PersistenceException error) {
             if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
                 getEntityManager().getTransaction().rollback();
             }
-            error.printStackTrace();
-            throw new DaoException("Erro ao remover a pessoa, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao realizar a remoção, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
     }
 
-    public void alterar(Pessoa pessoa) {
+    public void alterarPessoaUsuario(Pessoa pessoa) {
         try {
             getEntityManager().getTransaction().begin();
             getEntityManager().merge(pessoa);
+            getEntityManager().merge(pessoa.getUsuario());
             getEntityManager().getTransaction().commit();
         } catch (PersistenceException error) {
             if (getEntityManager() != null && getEntityManager().getTransaction().isActive()) {
                 getEntityManager().getTransaction().rollback();
             }
-            error.printStackTrace();
-            throw new DaoException("Erro ao tentar alterar a pessoa, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao tentar alterar a pessoa, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
     }
 
@@ -51,8 +74,9 @@ public class PessoaDao extends AbstractDao {
         } catch (NoResultException nre) {
             pessoa = new Pessoa();
         } catch (Exception error) {
-            error.printStackTrace();
-            throw new DaoException("Erro ao buscar uma pessoa, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao buscar uma pessoa, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
         return pessoa;
     }
@@ -66,7 +90,7 @@ public class PessoaDao extends AbstractDao {
             sql.append(" WHERE 1 = 1 ");
 
             if (restricoes.isNome() && !parametros.getNome().isEmpty())
-                sql.append(" AND UPPER(p.nome) LIKE UPPER(CONCAT('%', :nome, '%')) ");
+                sql.append(" AND sem_acento(UPPER(p.nome)) LIKE sem_acento(UPPER(CONCAT('%', :nome, '%'))) ");
 
             if (restricoes.isCargo() && (parametros.getCargo() != null || parametros.getCargo() > 0))
                 sql.append(" AND p.cargo.id = ").append(" :idCargo ");
@@ -88,8 +112,9 @@ public class PessoaDao extends AbstractDao {
 
             pessoas = query.getResultList();
         } catch (Exception error) {
-            error.printStackTrace();
-            throw new DaoException("Erro ao buscar pessoas, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao buscar pessoas, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
         return pessoas;
     }
@@ -99,8 +124,9 @@ public class PessoaDao extends AbstractDao {
         try {
             pessoas = getEntityManager().createQuery("SELECT p FROM Pessoa p ORDER BY p.nome", Pessoa.class).getResultList();
         } catch (Exception error) {
-            error.printStackTrace();
-            throw new DaoException("Erro ao buscar Pessoas, por favor contate o suporte para maiores detalhes.", error);
+            mensagemErro = "Erro ao buscar Pessoas, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
         }
         return pessoas;
     }

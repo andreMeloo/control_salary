@@ -33,5 +33,8 @@ public class Pessoa implements InterfacePersist {
     private Usuario usuario;
 
     @Transient
+    private PessoaSalario pessoaSalario;
+
+    @Transient
     private boolean salarioCalculado = false;
 }

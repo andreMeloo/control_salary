@@ -35,8 +35,10 @@ public class AutenticadorMbean extends AbstractControllerBean implements Seriali
     }
 
     public String autenticar() {
+        setMessagesSystem(new ListMessagesSystemControl());
         validaCampos();
-        // criar logica de identificar erros
+        if (hasMessages())
+            return null;
 
         UsuarioDao userDao = getDao(UsuarioDao.class);
         try {
@@ -50,22 +52,22 @@ public class AutenticadorMbean extends AbstractControllerBean implements Seriali
                         PessoaSalarioMbean mbean = getMBean("pessoaSalarioMbean");
                         return mbean.entrarListagemFuncionarios();
                     } else {
-                        ListMessagesSystemControl messagesSystem = new ListMessagesSystemControl();
-                        messagesSystem.addMensagem(new MensagemSistema(MensagemSistema.FALHA_AUTENTICACAO_SENHA_INCORRETA, TipoMensagem.ERROR));
+                        getMessagesSystem().addMensagem(new MensagemSistema(MensagemSistema.FALHA_AUTENTICACAO_SENHA_INCORRETA, TipoMensagem.ERROR));
                         return null;
                     }
                 }
             }
         } catch (Exception erro) {
-            throw new DaoException("Ocorreu um erro inesperado ao autenticar o usuário, contate o adiministrador do sistema para maiores informações", erro);
+            String mensagemErro = "Ocorreu um erro inesperado ao autenticar o usuário, contate o adiministrador do sistema para maiores informações";
+            getMessagesSystem().addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, erro);
         } finally {
             if (userDao != null) {
                 userDao.close();
             }
         }
 
-        // mensagem de erro de nome de usuário incorreto
-        System.out.println("Login incorreto");
+        getMessagesSystem().addMensagem(new MensagemSistema(MensagemSistema.FALHA_AUTENTICACAO_LOGIN_INCORRETO, TipoMensagem.ERROR));
         usuarioAutenticado = new Usuario();
         return null;
     }
@@ -84,12 +86,10 @@ public class AutenticadorMbean extends AbstractControllerBean implements Seriali
 
     private void validaCampos() {
         if (ValidatorUtil.isEmpty(getLoginForm())) {
-            // Logica de gerar mensagens de erro
-            System.out.println("Login: campo obrigatório");
+            getMessagesSystem().addMensagem(new MensagemSistema("Login: " + MensagemSistema.CAMPO_OBRIGATORIO, TipoMensagem.ERROR));
         }
         if (ValidatorUtil.isEmpty(getSenhaForm())) {
-            // Logica de gerar mensagens de erro
-            System.out.println("Senha: campo obrigatório");
+            getMessagesSystem().addMensagem(new MensagemSistema("Senha: " + MensagemSistema.CAMPO_OBRIGATORIO, TipoMensagem.ERROR));
         }
     }
 }
