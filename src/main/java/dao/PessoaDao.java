@@ -20,6 +20,9 @@ public class PessoaDao extends AbstractDao {
         try {
             getEntityManager().getTransaction().begin();
             getEntityManager().persist(pessoa);
+
+            pessoa.getUsuario().setPessoa(pessoa);
+
             getEntityManager().persist(pessoa.getUsuario());
             getEntityManager().getTransaction().commit();
         } catch (PersistenceException error) {

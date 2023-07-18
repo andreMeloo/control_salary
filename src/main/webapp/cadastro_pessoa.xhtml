@@ -1,10 +1,266 @@
 <ui:composition template="template/template_modelo.xhtml"
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+   <ui:define name="content">
+      <h:panelGroup styleClass="blocoContent" layout="block">
+         <table class="tableCadastro">
+            <caption>Cadastro de Usuário/Funcionário</caption>
+            <!-- Email e Telefone e Cargo -->
+            <tr>
+               <td style="display: flex; flex-direction: column; justify-content: center;">
+                  <h:outputLabel style="margin-bottom: 5px; text-align: center" value="Data de Nascimento" for="dataNascimento"/>
+                  <p:calendar id="dataNascimento" value="#{cadastroUsuarioMBean.objMovimentado.data_nascimento}"
+                              maxdate="#{cadastroUsuarioMBean.dataAtual}" mode="inline" navigator="true"/>
+               </td>
+               <td style="width: 100%">
+                  <table class="tableInt">
+                     <!-- Nome e Data de Nascimento -->
+                     <tr>
+                        <th>
+                           <h:outputLabel value="Nome: " for="nome"/>
+                        </th>
+                        <td style="width: 100%">
+                           <h:inputText autocomplete="off" style="width: 100%" id="nome" value="#{cadastroUsuarioMBean.objMovimentado.nome}" maxlength="100"/>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>
+                           <h:outputLabel value="Email:" for="email"/>
+                        </th>
+                        <td>
+                           <h:inputText autocomplete="off" style="width: 100%" id="email" value="#{cadastroUsuarioMBean.objMovimentado.email}" maxlength="80"/>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>
+                           <h:outputLabel value="Telefone:" for="fone"/>
+                        </th>
+                        <td>
+                           <p:inputMask autocomplete="off" style="width: 38%" id="fone" value="#{cadastroUsuarioMBean.objMovimentado.telefone}" mask="(99)9999-9999" maxlength="13"/>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>
+                           <h:outputLabel value="Cargo:" for="cargo"/>
+                        </th>
+                        <td>
+                           <h:selectOneMenu style="padding: 5px" id="cargo" value="#{cadastroUsuarioMBean.objMovimentado.cargo.id}">
+                              <f:ajax event="change" render="tipoUser" listener="#{cadastroUsuarioMBean.selecionaCargo}"/>
+                              <f:selectItem itemLabel="-- Selecione --" itemValue="0"/>
+                              <f:selectItems value="#{cadastroUsuarioMBean.cargosCombo}"/>
+                           </h:selectOneMenu>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>
+                           <h:outputLabel value="Usuario:" for="user"/>
+                        </th>
+                        <td>
+                           <h:inputText autocomplete="off" style="width: 38%" id="user" value="#{cadastroUsuarioMBean.login}" maxlength="15"/>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>
+                           <h:outputLabel value="Senha:" for="senha"/>
+                        </th>
+                        <td>
+                           <h:inputText styleClass="password-field" autocomplete="off" style="width: 38%" id="senha" value="#{cadastroUsuarioMBean.novaSenha}" maxlength="8"/>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th style="padding-top: 5px;">
+                           <h:outputLabel style="cursor: default" value="Status User:" for="tipoUser"/>
+                        </th>
+                        <td style="padding-top: 6px;">
+                           <h:outputText id="tipoUser" value="#{cadastroUsuarioMBean.objMovimentado.usuario.tipoUsuario.descricao}"/>
+                        </td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr>
+               <td colspan="2" style="width: 100%; border-bottom: 1px solid #2A332B; font-weight: bold; font-size: 1em; font-family: 'Roboto Mono', monospace">
+                  <h:outputText value="Endereço"/>
+               </td>
+            </tr>
+            <tr>
+               <th>
+                  <h:outputLabel value="CEP:" for="cep"/>
+               </th>
+               <td>
+                  <p:inputMask autocomplete="off" style="width: 90px;" id="cep" value="#{cadastroUsuarioMBean.objMovimentado.endereco.cep}" mask="99999-999" maxlength="9"/>
+               </td>
+            </tr>
+            <tr>
+               <th>
+                  <h:outputLabel value="Descrição:" for="ruaNum"/>
+               </th>
+               <td>
+                  <p:inputText autocomplete="off" style="width: 70%;" placeholder="Rua e N° da casa" id="ruaNum" value="#{cadastroUsuarioMBean.objMovimentado.endereco.descricao}"/>
+               </td>
+            </tr>
+            <tr>
+               <th>
+                  <h:outputLabel value="Estado:" for="uf"/>
+               </th>
+               <td>
+                  <h:selectOneMenu style="padding: 5px; width: 15%;" id="uf" value="#{cadastroUsuarioMBean.idEstado}">
+                     <f:ajax event="change" render="municipio" listener="#{cadastroUsuarioMBean.carregarMunicipios()}"/>
+                     <f:selectItem itemLabel="--" itemValue="0"/>
+                     <f:selectItems value="#{cadastroUsuarioMBean.estadosCombo}"/>
+                  </h:selectOneMenu>
+               </td>
+            </tr>
+            <tr>
+               <th>
+                  <h:outputLabel value="Municipio:" for="municipio"/>
+               </th>
+               <td>
+                  <h:selectOneMenu style="padding: 5px" id="municipio" value="#{cadastroUsuarioMBean.idCidade}">
+                     <f:selectItem itemLabel="-- Selecione --" itemValue="0"/>
+                     <f:selectItems value="#{cadastroUsuarioMBean.municipiosCombo}"/>
+                  </h:selectOneMenu>
+               </td>
+            </tr>
+            <tr>
+               <td colspan="2" style="text-align: center; padding-top: 10px;">
+                  <h:commandButton styleClass="buttonsTables" value="#{cadastroUsuarioMBean.objMovimentado.id > 0 ? 'Alterar Funcionário' : 'Cadastrar Funcionário'}" action="#{cadastroUsuarioMBean.persistirPessoa()}">
+                     <f:ajax event="click" render="@form" execute="@form"/>
+                  </h:commandButton>
+                  <h:commandButton styleClass="buttonsTables" value="Cancelar" action="#{cadastroUsuarioMBean.cancelar()}">
+                     <f:ajax event="click" render="@form" execute="@form"/>
+                  </h:commandButton>
+               </td>
+            </tr>
+         </table>
+      </h:panelGroup>
+      <style>
 
-   <h:panelGroup styleClass="tablesCadastro">
+         .password-field {
+            -webkit-text-security: disc; /* Chrome, Safari */
+            -moz-text-security: disc; /* Firefox */
+            text-security: disc; /* padrão */
+         }
 
-   </h:panelGroup>
+         .tableCadastro {
+            width: 80%;
+            background-color: #9DBFA0;
+            border-radius: 0 0 5px 5px;
+            border: 1px solid #2A332B;
+            border-top: none;
+            padding: 10px;
+            font-family: "Lato", sans-serif;
+         }
+
+         .tableCadastro th {
+            text-align: left;
+         }
+
+         .tableCadastro label {
+            font-weight: bold;
+         }
+
+         .tableCadastro input {
+            font-size: 14px !important;
+         }
+
+         .tableInt {
+            width: 100%;
+         }
+
+         .tableInt th {
+            width: 20%;
+         }
+
+         /** Geral Calendario */
+         body .ui-datepicker {
+            font-size: 0.75rem !important;
+            padding: 0.2rem !important;
+            border-color: #344035 !important;
+            color: #344035 !important;
+         }
+
+         /** Números e Letras e parte de dentro */
+         body .ui-datepicker td {
+            padding: 0 !important;
+            font-size: 12px !important;
+         }
+
+         body .ui-datepicker th {
+            padding: 0.1rem 0.5rem 0.1rem 0.5rem !important;
+         }
+
+         body .ui-datepicker table {
+            margin: 0.2rem 0 !important;
+         }
+
+         body .ui-datepicker td>a,
+         body .ui-datepicker td>span {
+            width: 1.1rem !important;
+            height: 1.1rem !important;
+            line-height: 1.1rem !important;
+         }
+
+         body .ui-datepicker td.ui-datepicker-current-day>a.ui-state-active {
+            background: #d1ebff !important;
+         }
+
+         /** Header Calendario */
+         body .ui-datepicker .ui-datepicker-header {
+            padding: 0.3rem !important;
+            border-color: #344035 !important;
+         }
+
+         body .ui-datepicker .ui-datepicker-prev, .ui-datepicker-next {
+            font-size: 0.6rem !important;
+            top: 78% !important;
+            width: 1.05rem !important;
+            height: 1.05rem !important;
+            line-height: 1.15rem !important;
+         }
+
+         body .ui-datepicker select {
+            font-size: 0.6rem !important;
+            width: 35% !important;
+            font-weight: bold;
+         }
+
+         body .ui-inputfield {
+            border: 1px solid #2A332B !important;
+            box-shadow: none !important;
+         }
+      </style>
+      <script type="text/javascript">
+         PrimeFaces.locales['pt'] = {
+            closeText: 'Fechar',
+            prevText: 'Anterior',
+            nextText: 'Próximo',
+            currentText: 'Começo',
+            monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+            monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+            dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+            dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+            dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+            weekHeader: 'Semana',
+            firstDay: 1,
+            isRTL: false,
+            showMonthAfterYear: false,
+            yearSuffix: '',
+            timeOnlyTitle: 'Só Horas',
+            timeText: 'Tempo',
+            hourText: 'Hora',
+            minuteText: 'Minuto',
+            secondText: 'Segundo',
+            currentText: 'Data Atual',
+            ampm: false,
+            month: 'Mês',
+            week: 'Semana',
+            day: 'Dia',
+            allDayText: 'Todo Dia'
+         };
+      </script>
+   </ui:define>
 </ui:composition>

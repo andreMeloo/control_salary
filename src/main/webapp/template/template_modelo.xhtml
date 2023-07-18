@@ -32,7 +32,7 @@
 
             <!-- Bloco de mensagens -->
 
-            <h:panelGroup styleClass="messages"  layout="block"  rendered="#{listMessagesSystemControl.messagesSession}">
+            <h:panelGroup styleClass="messages" id="mensagensSystem"  layout="block"  rendered="#{listMessagesSystemControl.messagesSession}">
                 <ui:insert name="messages">
                     <ui:include src="/system_message.xhtml"/>
                 </ui:insert>
@@ -52,11 +52,6 @@
                     </ui:insert>
                 </section>
             </section>
-
-    <!--        &lt;!&ndash; Rodapé &ndash;&gt;-->
-    <!--        <footer id="footer" class="#{autenticadorMbean.usuarioSessao.id == 0 ? 'usuarioDeslogadoHeaderFooter' : 'usuarioLogadoHeaderFooter'}">-->
-    <!--            <p>Meu Rodapé</p>-->
-    <!--        </footer>-->
         </h:form>
     </h:body>
     <style>
@@ -120,7 +115,7 @@
             top: 10%;
             left: 0;
             height: 170px;
-            text-wrap: nowrap;
+            white-space: nowrap;
         }
 
         #content-container {
@@ -142,11 +137,6 @@
             overflow: auto;
             box-shadow: 0 0 10px 7px rgba(52, 64, 53, 0.6);
         }
-
-        /*#footer {*/
-        /*    text-align: center;*/
-        /*    background-color: #4A5C37;*/
-        /*}*/
 
         .blocoUsuario {
             display: flex;
@@ -216,6 +206,7 @@
             color: #2A332B;
             border-radius: 3px;
             border: 1px solid #2A332B;
+            text-align: center;
         }
 
         table label {
@@ -297,6 +288,8 @@
             font-weight: 500;
         }
 
+
+
         .linhaPar {
             background-color: #EBFDEE;
         }
@@ -326,6 +319,16 @@
         .linkNavigation:focus,
         .linkNavigation:active {
             outline: none;
+        }
+
+        .blocoContent {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            font-size: 15px;
+            height: 100%;
+            width: 100%;
         }
 
     </style>

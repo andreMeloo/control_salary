@@ -19,7 +19,9 @@ import util.messagesSystem.TipoMensagem;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -27,13 +29,13 @@ import java.util.List;
 public class AbstractControllerBean implements Serializable {
 
     // Caminhos
-    protected static final String PAGINA_PESSOAS_SALARIOS = "/pessoas_salario.xhtml";
-    protected static final String PAGINA_LOGIN = "/login.xhtml";
-    protected static final String PAGINA_CADASTRO_PESSOA = "/cadastro_pessoa.xhtml";
+    public static final String PAGINA_PESSOAS_SALARIOS = "/pessoas_salario.xhtml";
+    public static final String PAGINA_LOGIN = "/login.xhtml";
+    public static final String PAGINA_CADASTRO_PESSOA = "/cadastro_pessoa.xhtml";
 
     // Botões
-    protected static final String BOTAO_NAVEGACAO_LISTA_FUNCIONARIOS = "listagemFunc";
-    protected static final String BOTAO_NAVEGACAO_CADASTRO_USUARIO = "cadastroUser";
+    public static final String BOTAO_NAVEGACAO_LISTA_FUNCIONARIOS = "listagemFunc";
+    public static final String BOTAO_NAVEGACAO_CADASTRO_USUARIO = "cadastroUser";
 
 
     private String botaoNavegacaoClicado;
@@ -50,8 +52,11 @@ public class AbstractControllerBean implements Serializable {
     }
 
     public void setbotaoNavegacaoClicado(String botaoClicado) {
-        HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-        session.setAttribute("botaoClicado", botaoClicado);
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        if (ValidatorUtil.isNotEmpty(facesContext)) {
+            HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+            session.setAttribute("botaoClicado", botaoClicado);
+        }
     }
 
     public void setUsuarioSessao(Usuario usuario) {
@@ -144,6 +149,10 @@ public class AbstractControllerBean implements Serializable {
     public boolean hasMessages() {
         ListMessagesSystemControl list = new ListMessagesSystemControl();
         return list.isMessagesSession();
+    }
+
+    public LocalDate getDataAtual() {
+        return LocalDate.now();
     }
 
 }

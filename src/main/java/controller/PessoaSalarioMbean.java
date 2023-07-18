@@ -5,6 +5,8 @@ import dao.EstadoDao;
 import dao.PessoaDao;
 import dao.PessoaSalarioDao;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ActionEvent;
@@ -66,12 +68,12 @@ public class PessoaSalarioMbean extends AbstractControllerBean implements Serial
         restricoesBusca = new RestricoesBusca();
         salariosNaoCalculados = 0;
         setMessagesSystem(new ListMessagesSystemControl());
-        setbotaoNavegacaoClicado(BOTAO_NAVEGACAO_LISTA_FUNCIONARIOS);
         populaLista();
     }
 
     public String entrarListagemFuncionarios() {
         init();
+        setbotaoNavegacaoClicado(BOTAO_NAVEGACAO_LISTA_FUNCIONARIOS);
         ListMessagesSystemControl.limpaMessagesSystem();
         try {
             return redirectPage(PAGINA_PESSOAS_SALARIOS);
@@ -234,12 +236,26 @@ public class PessoaSalarioMbean extends AbstractControllerBean implements Serial
         return null;
     }
 
-    public void exportToPDF() {
+    public String exportToPDF() {
+        setMessagesSystem(new ListMessagesSystemControl());
         InputStream stream = AbstractControllerBean.class.getResourceAsStream("/reports/pessoas_salarios.jrxml");
+        List<Pessoa> pessoasSalarioCaculado = new ArrayList<>();
+        for (Pessoa pessoaFuncionario : pessoas) {
+            PessoaSalario pessoaSalario = new PessoaSalario();
+            if (pessoaFuncionario.isSalarioCalculado()) {
+                pessoasSalarioCaculado.add(pessoaFuncionario);
+            }
+        }
+
+        if (ValidatorUtil.isEmpty(pessoasSalarioCaculado)) {
+            getMessagesSystem().addMensagem(new MensagemSistema("Não há funcionários com salários calculados na listagem atual.", TipoMensagem.ERROR));
+            return null;
+        }
+
         try {
             JasperReport reportPath = JasperCompileManager.compileReport(stream);
 
-            JasperPrint jasperPrint = JasperFillManager.fillReport(reportPath, null, new PessoaDataSource(pessoas));
+            JasperPrint jasperPrint = JasperFillManager.fillReport(reportPath, null, new PessoaDataSource(pessoasSalarioCaculado));
 
             // Exportar para PDF em memória
             byte[] pdfBytes = JasperExportManager.exportReportToPdf(jasperPrint);
@@ -252,16 +268,23 @@ public class PessoaSalarioMbean extends AbstractControllerBean implements Serial
             response.setContentLength(pdfBytes.length);
             response.setHeader("Content-Disposition", "inline; filename=\"relatorio_funcionarios_salarios.pdf\"");
 
+            UIViewRoot viewRoot = facesContext.getViewRoot();
+            String componentId = "mensagensSystem";
+            UIComponent component = viewRoot.findComponent(componentId);
+            if (component != null) {
+                component.setRendered(true);
+            }
+
             OutputStream outputStream = response.getOutputStream();
             outputStream.write(pdfBytes);
             outputStream.flush();
             outputStream.close();
             facesContext.responseComplete();
-            getMessagesSystem().addMensagem(new MensagemSistema("Exportação feita com sucesso! Arquivo gerado e pronto pra ser visualizado / feito download.", TipoMensagem.SUCCESS));
         } catch (JRException | IOException errorArquivo) {
             String mensagemErro = "Erro ao gerar arquivo PDF: Não foi possível encontrar o arquivo no caminho espécificado / Arquivo Comrrompido / Não foi possível gerar o PDF";
             getMessagesSystem().addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
             throw new DaoException(mensagemErro, errorArquivo);
         }
+        return null;
     }
 }

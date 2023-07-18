@@ -1,6 +1,8 @@
 package dao;
 
+import jakarta.persistence.NoResultException;
 import model.Cidade;
+import model.Pessoa;
 import util.DaoException;
 import util.messagesSystem.MensagemSistema;
 import util.messagesSystem.TipoMensagem;
@@ -22,6 +24,23 @@ public class CidadeDao extends AbstractDao {
             throw new DaoException(mensagemErro, error);
         }
         return cidades;
+    }
+
+    public Cidade findById(Integer id) {
+        Cidade cidade = new Cidade();
+        try {
+            String sql = "SELECT c FROM Cidade c WHERE c.id = :id";
+            cidade = getEntityManager().createQuery(sql, Cidade.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
+        } catch (NoResultException nre) {
+            cidade = new Cidade();
+        } catch (Exception error) {
+            mensagemErro = "Erro ao buscar um municipio, por favor contate o suporte para maiores detalhes.";
+            msgControl.addMensagem(new MensagemSistema(mensagemErro, TipoMensagem.ERROR));
+            throw new DaoException(mensagemErro, error);
+        }
+        return cidade;
     }
 
 }

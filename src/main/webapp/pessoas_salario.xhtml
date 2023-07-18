@@ -4,7 +4,7 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core">
     <ui:define name="content">
-        <h:panelGroup layout="block" styleClass="formListagem" style="height: 100%; width: 100%;">
+        <h:panelGroup layout="block" styleClass="blocoContent">
             <h:panelGroup layout="block" rendered="#{pessoaSalarioMbean.isAdministrador()}">
                 <table class="tablesBusca">
                     <caption>Busca Funcionários Cadastrados</caption>
@@ -62,7 +62,7 @@
                         <h:outputText value="#{pessoaSalarioMbean.salariosNaoCalculados}"/>
                     </div>
                     <div style="margin-right: 10px">
-                        <h:commandLink style="display: flex; align-items: center; justify-content: center; flex-direction: row;" target="_blank" action="#{pessoaSalarioMbean.exportToPDF()}">
+                        <h:commandLink style="display: flex; align-items: center; justify-content: center; flex-direction: row;" action="#{pessoaSalarioMbean.exportToPDF()}" target="_blank">
                             <h:graphicImage width="20" value="myResources/export_pdf.png" alt="informations"/>
                             <h:outputText style="font-family: 'Lato Light', serif; font-size: 12px" value="Exportar para PDF"/>
                         </h:commandLink>
@@ -121,14 +121,6 @@
             </h:panelGroup>
         </h:panelGroup>
         <style>
-            .formListagem {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding-top: 20px;
-                font-size: 15px;
-            }
-
             .inputNome {
                 width: 95%;
                 padding: 3px !important;
